@@ -1,0 +1,67 @@
+<!-- templates/telegram_app.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Africa App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="{% static 'loader/scripts.js' %}" defer></script>
+</head>
+<body style="background-color: #141520;"></body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tele = window.Telegram.WebApp;
+    
+        if (tele) {
+            tele.ready();
+    
+            const initData = tele.initData;
+            const params = new URLSearchParams(initData);
+            const userJson = params.get('user');
+            const user = JSON.parse(decodeURIComponent(userJson));
+            
+            sendDataToServer(user.id);
+        } else {
+            console.error('Telegram Web Apps SDK is not available.');
+        }
+    });
+    
+    async function sendDataToServer(userId) {
+        try {
+            const response = await fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ uid: userId })
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const responseData = await response.json();
+            console.log('Server Response:', responseData);
+    
+            if (responseData.redirect_url) {
+                const redirectUrl = responseData.redirect_url;
+                console.log('Redirect URL:', redirectUrl);
+    
+                // Редирект на полученный URL
+                redirectTo(redirectUrl);
+            } else {
+                console.error('Redirect URL not found in response');
+            }
+        } catch (error) {
+            console.error('Error occurred:', error);
+        }
+    }
+    
+    function redirectTo(url) {
+        window.location.href = url;
+    }
+    </script>
+    
+</html>

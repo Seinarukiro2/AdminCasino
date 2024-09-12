@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Список пользователей</h1>
+
+    <!-- Форма для поиска и создания нового пользователя -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="GET" action="{% url 'user_list' %}" class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Поиск по логину или hidden_login" value="{{ query|default:'' }}">
+                <input type="number" name="hall_id" class="form-control" placeholder="Фильтр по hall_id" value="{{ hall_id_filter }}">
+                <button class="btn btn-primary" type="submit">Поиск</button>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            <!-- Кнопка для открытия модального окна -->
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                +
+            </button>
+        </div>
+    </div>
+
+    <!-- Таблица пользователей -->
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Login</th>
+                <th>Hidden Login</th>
+                <th>Hall ID</th>
+                <th>Projects</th> <!-- Колонка для отображения проектов пользователя -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.login }}</td>
+                    <td>{{ user.hidden_login }}</td>
+                    <td>{{ user.hall_id }}</td>
+                    <td>
+                        {% if user.project %}
+                            {{ user.project.project_name }} ({{ user.project.project_link }})
+                        {% else %}
+                            <span>Нет проектов</span>
+                        {% endif %}
+                    </td>
+                    
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Пользователи не найдены</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Модальное окно для создания пользователя -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createUserModalLabel">Создание нового пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'create_test_user' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="login" class="form-label">Login</label>
+                            <input type="text" class="form-control" id="login" name="login" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hidden_login" class="form-label">Hidden Login</label>
+                            <input type="text" class="form-control" id="hidden_login" name="hidden_login" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hall_id" class="form-label">Hall ID</label>
+                            <select class="form-select" id="hall_id" name="hall_id" required>
+                                {% for project in projects %}
+                                <option value="{{ project.hall_id }}">{{ project.hall_id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Проекты{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Список проектов</h1>
+
+    <!-- Форма для поиска и создания нового проекта -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="GET" action="{% url 'project_list' %}" class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Поиск по названию проекта" value="{{ query|default:'' }}">
+                <input type="number" name="hall_id" class="form-control" placeholder="Фильтр по hall_id" value="{{ hall_id_filter }}">
+                <button class="btn btn-primary" type="submit">Поиск</button>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            <!-- Кнопка для открытия модального окна -->
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+                Новый проект
+            </button>
+        </div>
+    </div>
+
+    <!-- Секция с карточками проектов -->
+    <div class="row">
+        {% for project in projects %}
+        <div class="col-md-3 mb-3">
+            <div class="card h-100" style="width: 18rem;">
+                <div class="card-img-top text-center py-3">
+                    <i class="bi bi-laptop" style="font-size: 3rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ project.project_name }}</h5>
+                    <p class="card-text">Hall ID: {{ project.hall_id }}</p> <!-- Исправлен вывод hall_id -->
+                    <a href="{% url 'project_detail' project.id %}" class="btn btn-dark btn-sm">Подробнее</a> <!-- Меньшая кнопка -->
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">Проекты не найдены</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    
+
+    <!-- Модальное окно для создания проекта -->
+    <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createProjectModalLabel">Создание нового проекта</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'create_project' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="project_name" class="form-label">Название проекта</label>
+                            <input type="text" class="form-control" id="project_name" name="project_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="project_link" class="form-label">Ссылка на проект</label>
+                            <input type="url" class="form-control" id="project_link" name="project_link" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hall_id" class="form-label">Hall ID</label>
+                            <input type="number" class="form-control" id="hall_id" name="hall_id" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mac" class="form-label">MAC-адрес</label>
+                            <input type="text" class="form-control" id="mac" name="mac" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
