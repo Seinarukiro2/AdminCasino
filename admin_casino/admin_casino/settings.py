@@ -15,17 +15,39 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-gfm^mdv(u#7lwgea-ad@0@o8f^k!(c05gjz=6=@fq(13bi3(49'
-
+FERNET_KEY = b'rm-h1A2lFFHewlWdJbvmYpu7rB7gEjhy0lzAaXa922k='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+TORTOISE_ORM = {
+    "connections": {
+        "default": "postgres://admin_dev:CasinoAdminDev4464@localhost:5432/admin_casino"
+    },
+    "apps": {
+        "models": {
+            "models": ["admin_panel.models", "aerich.models"],  # Ваши модели
+            "default_connection": "default",
+        },
+    },
+}
 
 
 GINO = {
@@ -38,6 +60,7 @@ GINO = {
     'retry_limit': 1,
     'retry_interval': 1,
 }
+
 
 
 # Application definition
@@ -56,10 +79,11 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'admin_casino.urls'
@@ -121,6 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -142,3 +167,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+X_FRAME_OPTIONS = 'ALLOWALL'

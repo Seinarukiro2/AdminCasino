@@ -1,33 +1,28 @@
-# models_gino.py
-import gino
-from gino import Gino
+from tortoise import fields
+from tortoise.models import Model
 
-# Инициализация Gino
-db = Gino()
+class User(Model):
+    id = fields.IntField(pk=True)
+    login = fields.CharField(max_length=100, unique=True)
+    password = fields.CharField(max_length=255)
+    hidden_login = fields.CharField(max_length=100)
+    hall_id = fields.IntField(null=True)
+    project = fields.ForeignKeyField('models.Project', related_name='users', null=True)
 
-class User(db.Model):
-    __tablename__ = 'user'
+    def __str__(self):
+        return self.login
 
-    id = db.Column(db.Integer(), primary_key=True)
-    login = db.Column(db.String(), unique=True)
-    password = db.Column(db.String())
-    hidden_login = db.Column(db.String())
-    hall_id = db.Column(db.Integer(), nullable=True)
-    project_id = db.Column(db.Integer(), db.ForeignKey('project.id'), nullable=True)
 
-    def __repr__(self):
-        return f"<User login={self.login}>"
+class Project(Model):
+    id = fields.IntField(pk=True)
+    project_name = fields.CharField(max_length=255)
+    project_link = fields.CharField(max_length=255)
+    hall_id = fields.IntField(unique=True)
+    mac = fields.CharField(max_length=17, unique=True)
+    bot_token = fields.CharField(max_length=255, null=True, blank=True)
+    webapp_url = fields.CharField(max_length=255, null=True, blank=True)
+    bot_username = fields.CharField(max_length=255, null=True, blank=True)
 
-class Project(db.Model):
-    __tablename__ = 'project'
 
-    id = db.Column(db.Integer(), primary_key=True)
-    project_name = db.Column(db.String())
-    project_link = db.Column(db.String())
-    hall_id = db.Column(db.Integer(), unique=True)
-    mac = db.Column(db.String(), unique=True)
-    bot_token = db.Column(db.String(), nullable=True)
-    webapp_url = db.Column(db.String(), nullable=True)
-
-    def __repr__(self):
-        return f"<Project name={self.project_name}>"
+    def __str__(self):
+        return self.project_name

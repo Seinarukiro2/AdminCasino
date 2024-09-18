@@ -1,28 +1,42 @@
 import os
 from django.core.asgi import get_asgi_application
-from admin_panel.models import db  # Gino ORM
+from tortoise import Tortoise
 from starlette.applications import Starlette
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'admin_casino.settings')
 
-# Получаем стандартное ASGI-приложение Django
-django_app = get_asgi_application()
+# Конфигурация Tortoise ORM
+TORTOISE_ORM = {
+    "connections": {
+        "default": "postgres://admin_dev:CasinoAdminDev4464@localhost:5432/admin_casino"
+    },
+    "apps": {
+        "models": {
+            "models": ["admin_panel.models", "aerich.models"],  # Укажите свои модели и aerich
+            "default_connection": "default",
+        },
+    },
+}
 
-# Инициализация Gino
-async def init_gino():
+# Инициализация Tortoise ORM
+async def init_tortoise():
     try:
-        await db.set_bind('postgresql+asyncpg://admin_dev:CasinoAdminDev4464@localhost:5432/admin_casino')
-        print("Gino успешно инициализировано")
+        await Tortoise.init(config=TORTOISE_ORM)
+        await Tortoise.generate_schemas(safe=True)  # Генерация схем, если они не существуют
+        print("Tortoise ORM успешно инициализирована")
     except Exception as e:
-        print(f"Ошибка при инициализации Gino: {e}")
+        print(f"Ошибка при инициализации Tortoise ORM: {e}")
 
 # Жизненный цикл приложения
 async def lifespan(app):
-    print("Инициализация Gino при запуске приложения")
-    await init_gino()
+    print("Инициализация Tortoise ORM при запуске приложения")
+    await init_tortoise()
     yield
     print("Закрытие соединения с базой данных")
-    await db.pop_bind().close()
+    await Tortoise.close_connections()
+
+# Получаем стандартное ASGI-приложение Django
+django_app = get_asgi_application()
 
 # Создаем Starlette-приложение с жизненным циклом и интеграцией Django
 app = Starlette(lifespan=lifespan)
