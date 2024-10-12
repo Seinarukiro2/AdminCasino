@@ -22,7 +22,16 @@ class Project(Model):
     bot_token = fields.CharField(max_length=255, null=True, blank=True)
     webapp_url = fields.CharField(max_length=255, null=True, blank=True)
     bot_username = fields.CharField(max_length=255, null=True, blank=True)
-
+    start_message = fields.TextField(null=True, blank=True)
+    
 
     def __str__(self):
         return self.project_name
+
+class Settings(Model):
+    id = fields.IntField(pk=True)
+    api_id = fields.CharField(max_length=100)
+    api_hash = fields.CharField(max_length=255)
+
+    class Meta:
+        table = "settings"

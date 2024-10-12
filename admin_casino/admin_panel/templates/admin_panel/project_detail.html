@@ -44,6 +44,105 @@
         🗑️ Удалить проект
     </button>
 
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#botSettingsModal">
+        ⚙️ Настройки бота
+    </button>
+
+
+    <!-- Всплывающее окно для настроек бота -->
+<div class="modal fade" id="botSettingsModal" tabindex="-1" aria-labelledby="botSettingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botSettingsModalLabel">Настройки бота</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'update_bot_settings' project.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="bot_token" class="form-label">Bot Token</label>
+                        <input type="text" class="form-control" id="bot_token" name="bot_token" value="{{ project.bot_token }}" readonly>
+                        <button type="button" class="btn btn-outline-primary mt-2" id="editBotTokenButton">✏️ Редактировать токен</button>
+                    </div>
+                    <div class="mb-3">
+                        <label for="start_message" class="form-label">Приветственное сообщение</label>
+                        <textarea class="form-control" id="start_message" name="start_message" rows="3">{{ project.start_message }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+                <!-- Контейнер для уведомлений -->
+                <div id="alertContainer" class="mt-3"></div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success" id="startBotButton">Ран бот</button>
+                <button type="button" class="btn btn-outline-warning" id="restartBotButton">Рестарт бот</button>
+                <button type="button" class="btn btn-outline-danger" id="stopBotButton">Стоп бот</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAlert(message, type) {
+        // Типы: success, danger, warning, info
+        const alertContainer = document.getElementById('alertContainer');
+        const alertBox = document.createElement('div');
+        alertBox.className = `alert alert-${type} alert-dismissible fade show`;
+        alertBox.role = "alert";
+        alertBox.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        alertContainer.appendChild(alertBox);
+
+        // Автоматическое удаление уведомления через 5 секунд
+        setTimeout(() => {
+            alertBox.remove();
+        }, 5000);
+    }
+    document.getElementById('editBotTokenButton').addEventListener('click', function() {
+        const botTokenInput = document.getElementById('bot_token');
+        botTokenInput.readOnly = !botTokenInput.readOnly;
+    });
+
+    document.getElementById('startBotButton').addEventListener('click', function() {
+    // Запуск бота
+        fetch(`/start_bot/{{ project.id }}/`, { method: 'POST' }).then(response => {
+            if (response.ok) {
+                showAlert('Бот успешно запущен', 'success');
+            } else {
+                showAlert('Ошибка запуска бота', 'danger');
+            }
+        });
+    });
+
+    document.getElementById('restartBotButton').addEventListener('click', function() {
+        // Рестарт бота
+        fetch(`/restart_bot/${project.id}`, { method: 'POST' }).then(response => {
+            if (response.ok) {
+                alert('Бот успешно перезапущен');
+            } else {
+                alert('Ошибка перезапуска бота');
+            }
+        });
+    });
+
+    document.getElementById('stopBotButton').addEventListener('click', function() {
+        // Остановка бота
+        fetch(`/stop_bot/${project.id}`, { method: 'POST' }).then(response => {
+            if (response.ok) {
+                alert('Бот успешно остановлен');
+            } else {
+                alert('Ошибка остановки бота');
+            }
+        });
+    });
+</script>
+
     <!-- Попап для редактирования проекта -->
     <div class="modal fade" id="editProjectModal" tabindex="-1" aria-labelledby="editProjectModalLabel" aria-hidden="true">
         <div class="modal-dialog">

@@ -43,7 +43,7 @@ TORTOISE_ORM = {
     },
     "apps": {
         "models": {
-            "models": ["admin_panel.models", "aerich.models"],  # Ваши модели
+            "models": ["admin_panel.models", "aerich.models"],  # модеди
             "default_connection": "default",
         },
     },

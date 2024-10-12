@@ -1,0 +1,25 @@
+<!-- login_superuser.html -->
+{% extends 'base.html' %}
+
+{% block title %}Подтверждение суперпользователя{% endblock %}
+
+{% block content %}
+<h2>Подтверждение администратора</h2>
+
+{% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="POST" action="{% url 'update_settings' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="username" class="form-label">Логин суперпользователя</label>
+        <input type="text" class="form-control" id="username" name="username" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Пароль суперпользователя</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Подтвердить</button>
+</form>
+{% endblock %}

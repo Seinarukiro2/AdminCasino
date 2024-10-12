@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Настройки{% endblock %}
+
+{% block content %}
+<h2>Настройки API</h2>
+
+<form method="POST" action="{% url 'update_settings' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="api_id" class="form-label">API ID</label>
+        <input type="text" class="form-control" id="api_id" name="api_id" value="{{ settings.api_id }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="api_hash" class="form-label">API Hash</label>
+        <input type="text" class="form-control" id="api_hash" name="api_hash" value="{{ settings.api_hash }}" required>
+    </div>
+    
+    <!-- Кнопка для отправки изменений, которая вызывает модальное окно с запросом суперпользователя -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#superuserModal">
+        Сохранить изменения
+    </button>
+
+    <!-- Модальное окно для ввода логина и пароля суперпользователя -->
+    <div class="modal fade" id="superuserModal" tabindex="-1" aria-labelledby="superuserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="superuserModalLabel">Подтверждение администратора</h5>
+                    <h5 class="modal-title" id="superuserModalLabel"></h5>Данное действие может повлиять на работу ВСЕХ ботов!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Логин суперпользователя</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль суперпользователя</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Подтвердить и сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
